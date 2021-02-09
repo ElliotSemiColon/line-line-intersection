@@ -1,6 +1,8 @@
 export default class Point{
     constructor(x, y, draggable){
-        this.position = {x: x, y: y};
+        //this.position = {x: x, y: y};
+        this.x = x;
+        this.y = y;
         this.draggable = draggable;
         this.dragMargin = 10; //px
         this.radius = 10; //px
@@ -10,8 +12,8 @@ export default class Point{
     }  
 
     click(cursor){
-        let dy = (cursor.y - this.position.y);
-        let dx = (cursor.x - this.position.x);
+        let dy = (cursor.y - this.y);
+        let dx = (cursor.x - this.x);
         let distance = 
         Math.sqrt(dx*dx + dy*dy);
         if(distance <= this.radius+this.dragMargin && this.draggable){
@@ -22,14 +24,14 @@ export default class Point{
     }
 
     drag(cursor){
-        this.position.x = cursor.x - this.offsetFromMouse.x; //retains its relative position to mouse from when it was clicked
-        this.position.y = cursor.y - this.offsetFromMouse.y;
+        this.x = cursor.x - this.offsetFromMouse.x; //retains its relative position to mouse from when it was clicked
+        this.y = cursor.y - this.offsetFromMouse.y;
     }
 
     draw(ctx){
         if(this.visible){
             ctx.beginPath(); 
-            ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI, false); 
+            ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false); 
             ctx.fillStyle = 'rgba(255,255,255,0.5)';
             ctx.fill(); 
         }

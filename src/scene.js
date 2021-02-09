@@ -4,11 +4,12 @@ import Intersection from "/src/intersection.js";
 
 export default class Scene{
     constructor(){ //Point(spawnx, spawny, draggable)
-        this.lineSegments = [new LineSegment(new Point(100,100,true), new Point(200,200,true)),
-            new LineSegment(new Point(200,100,true), new Point(100,200,true))];
+        this.lineSegments = [new LineSegment(new Point(115,150,true), new Point(100,850,true)),
+            new LineSegment(new Point(205,100,true), new Point(550,150,true)),
+            new LineSegment(new Point(265,100,true), new Point(660,150,true)),
+            new LineSegment(new Point(34,450,true), new Point(550,600,true))]; //walls in the scene
         this.points;
-        this.intersection = new Intersection(10,10); //intersection is never draggable but inherits from point
-        this.intersectingLines = [0,1] //index of the lines you wanna perform the calculation on
+        //this.intersections = []; //intersection is never draggable but inherits from point
         this.isIntersecting = false;
     }
 
@@ -20,42 +21,57 @@ export default class Scene{
         });
     }
 
-    update(){ //intersection
-        this.lineSegments.forEach(lineSegment =>{
-            lineSegment.update();
-        });
-        let line1 = this.lineSegments[this.intersectingLines[0]]
-        let line2 = this.lineSegments[this.intersectingLines[1]];
-        //computes intersection
-        let denominator = (line1.A*line2.B - line2.A*line1.B);
+    update(ray){ //checks intersections with all walls per ray
+        ray.update(); //computes ABC for ray
+        let intersects = [];
+        this.lineSegments.forEach(segment =>{ //checks each wall in the scene
+            //segment.update(); //computes ABC for segment
 
-        if(denominator == 0){
-            this.isIntersecting = false;
-        }else{
-            let xDividend = line2.B*line1.C - line1.B*line2.C;
-            let yDividend = line1.A*line2.C - line2.A*line1.C;
-            let x = xDividend/denominator; //x and y of the intersection
-            let y = yDividend/denominator;
-            let rx0 = (x-line1.start.position.x)/(line1.end.position.x-line1.start.position.x); //if bigger than 1 or smaller than 0, intersection is not within line segment
-            let ry0 = (y-line1.start.position.y)/(line1.end.position.y-line1.start.position.y);
-            let rx1 = (x-line2.start.position.x)/(line2.end.position.x-line2.start.position.x); 
-            let ry1 = (y-line2.start.position.y)/(line2.end.position.y-line2.start.position.y);
-            if(rx0>=1||rx1>=1||ry0>=1||ry1>=1||rx0<=0||rx1<=0||ry0<=0||ry1<=0){ //these ratios combined determine if the line intersects
-                //console.log(rx0,rx1,ry0,ry1);
+            //computes intersection
+            let denominator = (ray.A*segment.B - segment.A*ray.B);
+
+            if(denominator == 0){
                 this.isIntersecting = false;
             }else{
-                this.intersection.position.x = x;
-                this.intersection.position.y = y;
-                this.isIntersecting = true;
+                let xDividend = segment.B*ray.C - ray.B*segment.C;
+                let yDividend = ray.A*segment.C - segment.A*ray.C;
+                let x = xDividend/denominator; //x and y of the intersection
+                let y = yDividend/denominator;
+                let rx0 = (x-ray.start.x)/(ray.end.x-ray.start.x); //if bigger than 1 or smaller than 0, intersection is not within line segment
+                let ry0 = (y-ray.start.y)/(ray.end.y-ray.start.y);
+                let rx1 = (x-segment.start.x)/(segment.end.x-segment.start.x); 
+                let ry1 = (y-segment.start.y)/(segment.end.y-segment.start.y);
+                if(rx0>=1||rx1>=1||ry0>=1||ry1>=1||rx0<=0||rx1<=0||ry0<=0||ry1<=0){ //these ratios combined determine if the line segment intersects
+                    //console.log(rx0,rx1,ry0,ry1);
+                    this.isIntersecting = false;
+                }else{
+                    intersects.push([x,y]);
+                    //this.intersections.push(new Intersection(x,y)); //pushes each intersection point
+                    //this.intersection.position.x = x;
+                    //this.intersection.position.y = y;
+                    this.isIntersecting = true;
+                }
             }
-        }
+        });
+        return intersects;
     }
 
     draw(ctx){ //draw lines and points
         this.lineSegments.forEach(lineSegment =>{
             lineSegment.draw(ctx);
         });
-        if(this.isIntersecting){this.intersection.draw(ctx);}
+        //console.log(this.isIntersecting);
+        //if(this.isIntersecting){
+        //    this.intersections.forEach(intersection => {
+        //        intersection.draw(ctx);
+        //    });
+        //}
+        //this.intersections.forEach(intersection => {
+        //    intersection.draw(ctx);
+        //});
+        //if(this.isIntersecting){
+        //    this.intersection.draw(ctx);
+        //}
     }
 
 }
