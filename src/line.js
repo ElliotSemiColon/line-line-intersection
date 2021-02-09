@@ -8,9 +8,9 @@ export default class LineSegment{
     }
 
     update(){
-        this.A = this.end.y - this.start.y;
-        this.B = this.start.x - this.end.x;
-        this.C = this.A*this.start.x + this.B*this.start.y;
+        this.A = this.end.position.y - this.start.position.y;
+        this.B = this.start.position.x - this.end.position.x;
+        this.C = this.A*this.start.position.x + this.B*this.start.position.y;
     }
 
     draw(ctx){
@@ -25,8 +25,8 @@ export default class LineSegment{
 
     drawLine(ctx){
         ctx.beginPath();
-        ctx.moveTo(this.start.x, this.start.y);
-        ctx.lineTo(this.end.x, this.end.y);
+        ctx.moveTo(this.start.position.x, this.start.position.y);
+        ctx.lineTo(this.end.position.x, this.end.position.y);
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = this.width;
         ctx.stroke(); 
